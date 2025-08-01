@@ -289,6 +289,14 @@ function Storage:save_chat(chat)
         project_root = utils.find_project_root(cwd),
     }
 
+    -- Set tool messages to be hidden when restored to prevent tool output in chat buffer
+    for _, msg in ipairs(chat_data.messages) do
+        if msg.role == "tool" or msg.tool_call_id then
+            msg.opts = msg.opts or {}
+            msg.opts.visible = false
+        end
+    end
+
     -- Save chat to file
     local save_result = self:_save_chat_to_file(utils.remove_functions(chat_data))
     if not save_result.ok then
